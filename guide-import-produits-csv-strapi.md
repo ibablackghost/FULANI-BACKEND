@@ -1,6 +1,19 @@
-# Importer des produits CSV dans Strapi (Nyra)
+# Importer des produits CSV dans Strapi (Fulani)
 
-Guide pour transformer un export WooCommerce (comme `wc-product-export-*.csv`) en CSV compatible Strapi, puis l’insérer via le script d’import — comme pour les tisanes / cafés / thés.
+Guide pour transformer un export WooCommerce Fulani (`wc-product-export-*.csv`) en CSV compatible Strapi, puis l’insérer via le script d’import — catalogue **Mode**.
+
+## Prérequis
+
+Content-types catalogue déjà en place dans ce repo :
+
+- **Category** (`/api/categories`)
+- **Product** (`/api/products`) + routes publiques `/api/catalog/products` et `/api/products/slug/:slug`
+- **Variant** (`/api/variants`)
+- **Tag** (`/api/tags`)
+
+Schémas : `src/api/product/.../schema.json`, `src/api/variant/.../schema.json`.
+
+---
 
 ## Principe
 
@@ -9,23 +22,23 @@ Strapi n’importe **pas** le CSV WooCommerce brut. On passe par 2 fichiers :
 | Fichier | Rôle |
 |---|---|
 | Export Woo (`wc-product-export-….csv`) | Source brute (FR, métas WP, IDs Woo) |
-| CSV enrichi (`produits_*_enrichi.csv`) | Format cible lu par `nyra-cms/scripts/import-tisanes.mjs` |
+| CSV enrichi (`produits_mode_enrichi.csv`) | Format cible lu par `scripts/import-mode.mjs` |
 
 Le script crée / met à jour :
 
-- **Category** (ex. `tisanes`, `mode`)
+- **Category** (ex. `mode`)
 - **Product** (ligne `Type=variable`)
 - **Variant** (lignes `Type=variation`)
 - **Tag** (optionnel)
 
-L’image est stockée en URL externe dans `product.imageUrl` (pas d’upload disque Railway).
+L’image est stockée en URL externe dans `product.imageUrl` (pas d’upload disque obligatoire).
 
 ---
 
-## 1. Structure WooCommerce (ton export)
+## 1. Structure WooCommerce (export Fulani)
 
 Exemple : `wc-product-export-29-7-2026-1785333248464.csv`  
-→ **20** produits parents (`variable`) + **36** variations.
+→ produits parents (`variable`) + variations (Top / Ensemble, couleur, taille…).
 
 ### Lignes parents (`Type = variable`)
 
@@ -43,27 +56,27 @@ Colonnes utiles côté Woo (FR) :
 | `Type` | `variable` / `variation` | Même logique |
 | `Nom` | `ROSHI` | `product.name` |
 | `Description courte` | … | `shortDescription` |
-| `Description` | HTML | `description` (+ `ingredients` si pas d’ingrédients) |
+| `Description` | HTML | `description` |
 | `Images` | URL(s) séparées par `, ` | Première URL → `imageUrl` |
 | `Tarif régulier` | `25250` | Prix variante (XOF entier) |
 | `Parent` | `id:1875` | Relie variation → parent (à remplacer par SKU) |
-| `Nom de l’attribut 1` | `type` | Attribut principal (format / type) |
+| `Nom de l’attribut 1` | `type` | Attribut principal (Top / Ensemble) → `variant.format` |
 | `Valeur(s) de l’attribut 1 ` | `Top` / `Top, Ensemble` | Valeur variante |
-| `Nom de l’attribut 2` | `couleur` | → `variant.colorName` (si tu l’utilises) |
+| `Nom de l’attribut 2` | `couleur` | → `variant.colorName` |
 | `Nom de l’attribut 3` | `taille` | → `variant.size` |
-| `Catégories` | `Non classé` | À remplacer (ex. `MODE`) |
+| `Catégories` | `Non classé` | À remplacer par `MODE` |
 | `En stock ?` / `Stock` | `1` / vide | `variant.stock` |
 
 ---
 
 ## 2. Format CSV cible (enrichi) — celui que Strapi attend
 
-Référence : `produits_tisanes_enrichi.csv`.
+Référence : `produits_mode_enrichi.csv` (à la racine du projet ou dans `data/`).
 
 ### En-têtes obligatoires / recommandés
 
 ```csv
-Name,SKU,Type,Categories,Regular price,Short description,Description,Images,Link,Parent,Attribute 1 name,Attribute 1 value(s),Attribute 1 visible,Attribute 1 global,Attribute 1 default,Strapi category,Stock,Slug,Meta title,Meta description,Status,Compare at price,Tags,Dosage,Temps infusion,Température,Origine,Nom botanique,Image alt text,Gallery images
+Name,SKU,Type,Categories,Regular price,Short description,Description,Images,Link,Parent,Attribute 1 name,Attribute 1 value(s),Attribute 1 visible,Attribute 1 global,Attribute 1 default,Attribute 2 name,Attribute 2 value(s),Attribute 3 name,Attribute 3 value(s),Strapi category,Stock,Slug,Meta title,Meta description,Status,Compare at price,Tags,Image alt text,Gallery images
 ```
 
 ### Règles
@@ -76,42 +89,35 @@ Name,SKU,Type,Categories,Regular price,Short description,Description,Images,Link
 6. `Status` = `published` ou `draft`.
 7. `Slug` uniquement sur le parent (uid Strapi).
 8. `Images` = URL HTTPS publique (1re URL si plusieurs).
-9. `Strapi category` = nom de catégorie catalogue (ex. `MODE`, `TISANES`).
+9. `Strapi category` = `MODE` (ou autre slug catalogue Fulani).
 
-### Exemple tisane (déjà en prod)
+### Mapping attributs mode → Variant Strapi
+
+| Attribut CSV | Champ Strapi |
+|---|---|
+| Attribute 1 (souvent `Type` : Top, Ensemble) | `variant.format` (+ `label`) |
+| Attribute 2 (`couleur`) | `variant.colorName` |
+| Attribute 3 (`taille`) | `variant.size` |
+
+> Si une seule dimension change le prix (ex. Top vs Ensemble), mets-la en **Attribute 1**.  
+> Couleur / taille peuvent rester en Attribute 2 / 3 même si le prix est identique.
+
+### Exemple mode — ROSHI
+
+À partir de `ROSHI` (parent Woo) + variations Top `25250` / Ensemble `45500` :
 
 **Parent**
 
 ```csv
-Fenouil Bio En Vrac,tisane-001,variable,TISANES,,"…short…","…desc…",https://….jpg,,,"Poids","250g, 50g",1,0,250g,TISANES,,fenouil-bio-en-vrac,"Meta…","Meta desc…",published,,Tisane|Bio,,,,,,,
+ROSHI,mode-roshi,variable,MODE,,"Cras in blandit…","<p>Le <strong>Roshi</strong>…</p>",https://fulaniofficial.com/wp-content/uploads/2024/10/A7-scaled.jpeg,,,"Type","Top, Ensemble",1,0,Top,,,,MODE,,roshi,"ROSHI | Fulani","Habit traditionnel revisitée…",published,,Mode|Fulani,,
 ```
 
 **Variations**
 
 ```csv
-Fenouil Bio En Vrac - 250g,tisane-001-250g,variation,TISANES,8900,,,,"",tisane-001,Poids,250g,1,0,,TISANES,25,,,,,published,,,,,,,
-Fenouil Bio En Vrac - 50g,tisane-001-50g,variation,TISANES,2500,,,,"",tisane-001,Poids,50g,1,0,,TISANES,40,,,,,published,,,,,,,
+ROSHI - Top,mode-roshi-top,variation,MODE,25250,,,,"",mode-roshi,Type,Top,1,0,,,,,,,MODE,10,,,,,published,,,
+ROSHI - Ensemble,mode-roshi-ensemble,variation,MODE,45500,,,,"",mode-roshi,Type,Ensemble,1,0,,,,,,,MODE,10,,,,,published,,,
 ```
-
-### Exemple mode (à partir de ton export Fulani)
-
-À partir de `ROSHI` (parent Woo `333`) + variations Top `25250` / Ensemble `45500` :
-
-**Parent**
-
-```csv
-ROSHI,mode-roshi,variable,MODE,,"Cras in blandit…","<p>Le <strong>Roshi</strong>…</p>",https://fulaniofficial.com/wp-content/uploads/2024/10/A7-scaled.jpeg,,,"Type","Top, Ensemble",1,0,Top,MODE,,roshi,"ROSHI | Fulani","Habit traditionnel revisitée…",published,,Mode|Fulani,,,,,,,
-```
-
-**Variations**
-
-```csv
-ROSHI - Top,mode-roshi-top,variation,MODE,25250,,,,"",mode-roshi,Type,Top,1,0,,MODE,10,,,,,published,,,,,,,
-ROSHI - Ensemble,mode-roshi-ensemble,variation,MODE,45500,,,,"",mode-roshi,Type,Ensemble,1,0,,MODE,10,,,,,published,,,,,,,
-```
-
-> Couleur / taille : le script tisanes actuel mappe surtout **Attribute 1** → `format` / `size` / poids.  
-> Pour mode, soit tu mets `Type` (Top/Ensemble) en Attribute 1 (prix différent), soit tu étends le script pour `colorName` + `size`.
 
 ---
 
@@ -123,7 +129,7 @@ ROSHI - Ensemble,mode-roshi-ensemble,variation,MODE,45500,,,,"",mode-roshi,Type,
 | *(à créer)* | `SKU` | clé upsert produit / parent |
 | *(à créer)* | `Slug` | `product.slug` |
 | `Description courte` | `Short description` | `product.shortDescription` |
-| `Description` | `Description` | `product.description` (+ `ingredients`) |
+| `Description` | `Description` | `product.description` |
 | 1re URL de `Images` | `Images` | `product.imageUrl` |
 | `Catégories` / manuel | `Strapi category` | relation `category` |
 | `Étiquettes` | `Tags` (`\|` séparés) | relation `tags` |
@@ -133,7 +139,9 @@ ROSHI - Ensemble,mode-roshi-ensemble,variation,MODE,45500,,,,"",mode-roshi,Type,
 | `Parent` `id:XXX` | `Parent` = SKU parent | relation `variant.product` |
 | `Tarif régulier` | `Regular price` | `variant.price` (+ min → `product.price`) |
 | `Stock` | `Stock` | `variant.stock` |
-| `Valeur(s) attribut 1` | `Attribute 1 value(s)` | `variant.format` / `label` / `size` |
+| Attr. 1 (Type) | `Attribute 1 value(s)` | `variant.format` |
+| Attr. 2 (couleur) | `Attribute 2 value(s)` | `variant.colorName` |
+| Attr. 3 (taille) | `Attribute 3 value(s)` | `variant.size` |
 
 Prix produit Strapi = **minimum** des prix des variations.
 
@@ -141,80 +149,46 @@ Prix produit Strapi = **minimum** des prix des variations.
 
 ## 4. Checklist de préparation du CSV
 
-1. Exporter Woo → CSV.
-2. Ne garder que les colonnes utiles (ou tout garder, mais remplir le format enrichi).
-3. Pour chaque parent :
-   - inventer `SKU` + `Slug` (minuscules, tirets, uniques) ;
+1. Exporter WooCommerce Fulani → CSV.
+2. Pour chaque parent :
+   - inventer `SKU` + `Slug` (minuscules, tirets, uniques) — préfixe `mode-` recommandé ;
    - nettoyer HTML si besoin ;
-   - fixer `Strapi category` ;
+   - fixer `Strapi category` = `MODE` ;
    - prendre la **première** URL image.
-4. Pour chaque variation :
+3. Pour chaque variation :
    - `Parent` = SKU parent (plus `id:1875`) ;
    - `SKU` unique ;
    - `Regular price` en entier XOF (ex. `25250`) ;
-   - `Attribute 1 value(s)` = valeur vendable (Top, 250g…).
-5. Enregistrer en UTF-8 : `produits_mode_enrichi.csv` (à la racine du monorepo, comme les autres).
-6. Adapter le script si la catégorie n’est pas `tisanes` (voir §5).
+   - `Attribute 1 value(s)` = valeur vendable (Top, Ensemble…) ;
+   - renseigner couleur / taille si présentes.
+4. Enregistrer en UTF-8 : `produits_mode_enrichi.csv`.
+5. (Optionnel) Convertir automatiquement avec `scripts/convert-wc-to-enrichi.mjs`.
 
 ---
 
-## 5. Insertion dans Strapi
+## 5. Insertion dans Strapi (dashboard Admin)
 
-### Prérequis
+### Via l’admin (recommandé)
 
-- Strapi démarré (`STRAPI_URL`, défaut `http://localhost:1337`)
-- Token API avec droits create/update sur `products`, `variants`, `categories`, `tags` :
-  - variable d’env `STRAPI_IMPORT_TOKEN`
+1. Démarre Strapi : `npm run develop`
+2. Ouvre l’admin → menu **Import Produits CSV**
+3. Choisis `produits_mode_enrichi.csv`
+4. Options :
+   - **Test à blanc** : simule sans écrire
+   - **Media Library** : upload aussi les images (sinon URLs externes dans `imageUrl`)
+   - **Remplacer la catégorie** : efface Mode puis réimporte
+5. Clique **Lancer l’import** → rapport (créés / mis à jour / erreurs)
 
-### Script existant
+L’import crée automatiquement : catégorie, tags, produits, variantes (format Top/Ensemble, prix, stock, `imageUrl`).
 
-Fichier : `nyra-cms/scripts/import-tisanes.mjs`
+### Via script CLI (alternative)
 
-Il lit un CSV au format enrichi, crée la catégorie `tisanes`, puis upsert produits + variantes.
-
-```bash
-cd nyra-cms
-
-# Dry-run (aucune écriture)
-$env:DRY_RUN="true"
-$env:TISANES_CSV_PATH="../produits_tisanes_enrichi.csv"
-node scripts/import-tisanes.mjs
-
-# Import réel
-$env:DRY_RUN="false"
-$env:STRAPI_URL="http://localhost:1337"
+```powershell
 $env:STRAPI_IMPORT_TOKEN="ton_token"
-$env:TISANES_CSV_PATH="../produits_tisanes_enrichi.csv"
-node scripts/import-tisanes.mjs
+npm run import:mode
+# ou dry-run :
+npm run import:mode:dry
 ```
-
-Via npm (dry-run) :
-
-```bash
-npm run import:tisanes:dry
-```
-
-### Pour un autre catalogue (ex. mode)
-
-1. Copier le script → `import-mode.mjs` (ou passer la catégorie en env).
-2. Changer :
-   - chemin CSV → `../produits_mode_enrichi.csv`
-   - slug catégorie → `mode` / name `Mode`
-3. Lancer le même flux `DRY_RUN` puis import réel.
-
-Le mapping image reste : `Images` CSV → `product.imageUrl`.
-
-### Backfill images seulement
-
-Si les produits existent déjà sans `imageUrl` :
-
-```bash
-cd nyra-cms
-node scripts/backfill-product-image-url.mjs --from-csv --dry-run
-node scripts/backfill-product-image-url.mjs --from-csv
-```
-
-(ajoute ton nouveau CSV dans la liste `CSV_FILES` du script si besoin)
 
 ---
 
@@ -224,7 +198,7 @@ Tu peux créer le CSV enrichi dans Excel / Google Sheets :
 
 1. Ligne 1 = en-têtes (§2).
 2. Une ligne `variable` par produit.
-3. Une ligne `variation` par taille / format / type vendable.
+3. Une ligne `variation` par type / couleur / taille vendable.
 4. Exporter **CSV UTF-8**.
 5. Lancer l’import.
 
@@ -244,31 +218,32 @@ Champs minimum d’une variation :
 Dans Strapi Admin ou API :
 
 ```http
-GET /api/products?filters[slug][$eq]=roshi&populate=variants,category
+GET /api/products?filters[slug][$eq]=roshi&populate=variants,category,tags
 ```
 
 Contrôler :
 
 - produit publié + `imageUrl` HTTPS
-- variantes avec `sku`, `price`, `stock`
+- variantes avec `sku`, `price`, `stock`, `format` (et `colorName` / `size` si renseignés)
 - `product.price` = plus bas prix variante
-- catégorie correcte
+- catégorie `MODE`
 
 ---
 
-## Fichiers de référence dans le repo
+## Fichiers de référence
 
 | Fichier | Rôle |
 |---|---|
-| `wc-product-export-29-7-2026-1785333248464.csv` | Export Woo brut (mode) |
-| `produits_mode_enrichi.csv` | CSV enrichi mode (généré) |
+| `wc-product-export-*.csv` | Export Woo brut (Fulani) |
+| `produits_mode_enrichi.csv` | CSV enrichi mode |
 | `scripts/convert-wc-to-enrichi.mjs` | Convertisseur Woo → enrichi |
-| `produits_tisanes_enrichi.csv` | Modèle CSV cible |
-| `produits_cafes_enrichi.csv` / `the_bio` / `herboristerie` / `accessoires` | Autres catalogues |
-| `nyra-cms/scripts/import-tisanes.mjs` | Import API Strapi |
-| `nyra-cms/scripts/backfill-product-image-url.mjs` | Sync `imageUrl` depuis CSV |
-| `nyra-cms/src/api/product/.../schema.json` | Schéma Product |
-| `nyra-cms/src/api/variant/.../schema.json` | Schéma Variant |
+| `scripts/import-mode.mjs` | Import CLI (alternative) |
+| `src/utils/import-mode.ts` | Logique d’import (Admin + CLI) |
+| `src/admin/pages/ImportMode.tsx` | Page Admin « Import Produits CSV » |
+| `src/api/product/.../schema.json` | Schéma Product |
+| `src/api/variant/.../schema.json` | Schéma Variant |
+| `src/api/category/.../schema.json` | Schéma Category |
+| `src/api/tag/.../schema.json` | Schéma Tag |
 
 ---
 
@@ -276,5 +251,5 @@ Contrôler :
 
 1. Export Woo ≠ import Strapi.  
 2. Convertir en CSV enrichi (SKU, Slug, Parent=SKU, prix sur variations).  
-3. `STRAPI_IMPORT_TOKEN` + `node scripts/import-tisanes.mjs` (ou copie mode).  
-4. Images = URLs externes dans `imageUrl`.
+3. Admin → **Import Produits CSV** → déposer `produits_mode_enrichi.csv`.  
+4. Images = URLs externes dans `imageUrl` (option Media Library si besoin).

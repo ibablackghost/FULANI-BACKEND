@@ -5,18 +5,41 @@
     "singularName": "category",
     "pluralName": "categories",
     "displayName": "Category",
-    "description": "Organize your content into categories"
+    "description": "Catégories catalogue Fulani"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "slug": {
-      "type": "uid"
+      "type": "uid",
+      "targetField": "name",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "metaTitle": {
+      "type": "string",
+      "maxLength": 70
+    },
+    "metaDescription": {
+      "type": "text",
+      "maxLength": 180
+    },
+    "canonicalPath": {
+      "type": "string"
     },
     "articles": {
       "type": "relation",
@@ -24,8 +47,11 @@
       "target": "api::article.article",
       "mappedBy": "category"
     },
-    "description": {
-      "type": "text"
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "category"
     }
   }
 }

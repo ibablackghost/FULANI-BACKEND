@@ -1,0 +1,118 @@
+{
+  "kind": "collectionType",
+  "collectionName": "products",
+  "info": {
+    "singularName": "product",
+    "pluralName": "products",
+    "displayName": "Product",
+    "description": "Produits catalogue Fulani Mode"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true,
+      "unique": true
+    },
+    "shortDescription": {
+      "type": "text"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "price": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "compareAtPrice": {
+      "type": "integer",
+      "min": 0
+    },
+    "rating": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "reviews": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "metaTitle": {
+      "type": "string",
+      "maxLength": 70
+    },
+    "metaDescription": {
+      "type": "text",
+      "maxLength": 180
+    },
+    "canonicalPath": {
+      "type": "string"
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "imageUrl": {
+      "type": "string",
+      "required": false
+    },
+    "imageAlt": {
+      "type": "string"
+    },
+    "galleryUrls": {
+      "type": "text"
+    },
+    "availableColors": {
+      "type": "text",
+      "description": "Couleurs disponibles (JSON array), ex. [\"Noir\",\"Blanc\"]"
+    },
+    "availableSizes": {
+      "type": "text",
+      "description": "Tailles disponibles (JSON array), ex. [\"S\",\"M\",\"L\",\"XL\"]"
+    },
+    "availableFormats": {
+      "type": "text",
+      "description": "Formats / types disponibles (JSON array), ex. [\"Top\",\"Ensemble\"]"
+    },
+    "gallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "required": true,
+      "inversedBy": "products"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag",
+      "inversedBy": "products"
+    },
+    "variants": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::variant.variant",
+      "mappedBy": "product"
+    }
+  }
+}
