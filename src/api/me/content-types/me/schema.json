@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "mes",
+  "info": {
+    "singularName": "me",
+    "pluralName": "mes",
+    "displayName": "Me",
+    "description": "Stub pour monter les routes /api/me (non utilisé en contenu)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "me"
+    }
+  }
+}

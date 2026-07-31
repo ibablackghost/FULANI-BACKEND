@@ -37,6 +37,16 @@
     "colorHex": {
       "type": "string"
     },
+    "color": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::color.color"
+    },
+    "sizeRef": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::size.size"
+    },
     "price": {
       "type": "integer",
       "min": 0

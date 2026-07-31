@@ -10,6 +10,7 @@
     "incremental": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "allowJs": true,
     "noEmitOnError": true,
     "noImplicitThis": true,
     "outDir": "dist",

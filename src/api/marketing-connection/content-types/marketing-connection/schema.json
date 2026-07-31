@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "marketing_connections",
+  "info": {
+    "singularName": "marketing-connection",
+    "pluralName": "marketing-connections",
+    "displayName": "Marketing Connection",
+    "description": "Connexions GA4 / Meta / TikTok — secrets chiffrés"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "provider": {
+      "type": "enumeration",
+      "enum": ["ga4", "meta", "tiktok"],
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["disabled", "enabled", "error"],
+      "default": "disabled",
+      "required": true
+    },
+    "config": {
+      "type": "json",
+      "description": "Champs publics. GA4: measurementId, propertyId, enabled, debug. Meta/TikTok: pixelId. Jamais apiSecret/token ici."
+    },
+    "secretsEncrypted": {
+      "type": "text",
+      "private": true,
+      "description": "Secrets chiffrés AES-GCM. GA4: {\"apiSecret\":\"...\"}. Meta: token CAPI. Ne jamais exposer en API publique."
+    },
+    "lastError": {
+      "type": "text"
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}

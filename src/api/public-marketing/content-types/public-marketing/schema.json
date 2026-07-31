@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "public_marketings",
+  "info": {
+    "singularName": "public-marketing",
+    "pluralName": "public-marketings",
+    "displayName": "Public Marketing",
+    "description": "Stub pour monter GET /api/public/marketing-config"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "public-marketing"
+    }
+  }
+}

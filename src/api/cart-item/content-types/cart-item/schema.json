@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cart_items",
+  "info": {
+    "singularName": "cart-item",
+    "pluralName": "cart-items",
+    "displayName": "Cart Item",
+    "description": "Lignes panier Fulani"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "quantity": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 1
+    },
+    "unitPrice": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "selectedFormat": {
+      "type": "string"
+    },
+    "selectedColor": {
+      "type": "string"
+    },
+    "selectedSize": {
+      "type": "string"
+    },
+    "cart": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cart.cart",
+      "inversedBy": "items",
+      "required": true
+    },
+    "variant": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::variant.variant",
+      "required": true
+    }
+  }
+}

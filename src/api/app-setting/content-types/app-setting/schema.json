@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "app_settings",
+  "info": {
+    "singularName": "app-setting",
+    "pluralName": "app-settings",
+    "displayName": "App Setting",
+    "description": "Configuration clé/valeur Fulani"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "group": {
+      "type": "enumeration",
+      "enum": ["general", "shipping", "marketing", "payment"],
+      "default": "general"
+    },
+    "value": {
+      "type": "json"
+    },
+    "label": {
+      "type": "string"
+    }
+  }
+}

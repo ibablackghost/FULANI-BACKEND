@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sizes",
+  "info": {
+    "singularName": "size",
+    "pluralName": "sizes",
+    "displayName": "Size",
+    "description": "Référentiel tailles Fulani"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true,
+      "unique": true
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    }
+  }
+}

@@ -90,6 +90,14 @@
       "type": "text",
       "description": "Formats / types disponibles (JSON array), ex. [\"Top\",\"Ensemble\"]"
     },
+    "isNew": {
+      "type": "boolean",
+      "default": false
+    },
+    "isFeatured": {
+      "type": "boolean",
+      "default": false
+    },
     "gallery": {
       "type": "media",
       "multiple": true,
@@ -101,6 +109,12 @@
       "target": "api::category.category",
       "required": true,
       "inversedBy": "products"
+    },
+    "collections": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::collection.collection",
+      "mappedBy": "products"
     },
     "tags": {
       "type": "relation",

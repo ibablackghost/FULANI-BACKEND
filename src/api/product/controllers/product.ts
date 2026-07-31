@@ -19,6 +19,8 @@ const SAFE_PRODUCT_FIELDS = [
   'availableColors',
   'availableSizes',
   'availableFormats',
+  'isNew',
+  'isFeatured',
 ] as const;
 
 const SAFE_PRODUCT_POPULATE = {
@@ -183,6 +185,8 @@ const publicProduct = (product: AnyRecord) => {
     colors: parseJsonList(product.availableColors),
     sizes: parseJsonList(product.availableSizes),
     formats: parseJsonList(product.availableFormats),
+    isNew: Boolean(product.isNew),
+    isFeatured: Boolean(product.isFeatured),
     category: publicCategory(product.category),
     tags: (product.tags ?? []).map(publicTag),
     variants: variants.map(publicVariant),

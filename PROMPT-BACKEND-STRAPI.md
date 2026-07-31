@@ -3,6 +3,10 @@
 Copie-colle ce prompt tel quel à un agent / développeur backend.  
 **Ne génère pas de frontend.** Backend uniquement.
 
+> **Contraintes actuelles (local)** : pas de Docker, pas de Redis/BullMQ, pas de Cloudinary pour l’instant.  
+> Médias = `imageUrl` / upload local Strapi. Jobs async = synchrones ou à brancher plus tard.  
+> PostgreSQL local déjà configuré.
+
 ---
 
 ## Prompt à coller
