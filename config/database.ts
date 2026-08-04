@@ -3,11 +3,19 @@ import type { Core } from '@strapi/strapi';
 import { isDatabaseClientKind } from '@strapi/database';
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Database => {
-  const client = env('DATABASE_CLIENT', 'sqlite');
+  const defaultClient =
+    env('DATABASE_URL') || env('NODE_ENV') === 'production' ? 'postgres' : 'sqlite';
+  const client = env('DATABASE_CLIENT', defaultClient);
 
   if (!isDatabaseClientKind(client)) {
     throw new Error(
       `Unsupported DATABASE_CLIENT: ${client}. Use "postgres", "mysql", or "sqlite".`
+    );
+  }
+
+  if (client === 'postgres' && !env('DATABASE_URL') && !env('DATABASE_HOST')) {
+    throw new Error(
+      'Postgres requis mais DATABASE_URL (ou DATABASE_HOST) manquant. Sur Railway: DATABASE_URL=${{Postgres.DATABASE_URL}}'
     );
   }
 
