@@ -1,22 +1,27 @@
 # Fulani Backend — Strapi 5 production image (Railway / Docker)
-# Debian slim: plus fiable que Alpine (sharp / native modules)
+# Node 22 + Debian slim (évite Alpine/musl + sharp, et EBADENGINE >=22.13)
 
 # ---------- Build ----------
-FROM node:20-bookworm-slim AS build
+FROM node:22-bookworm-slim AS build
+
+# Utilise les binaires précompilés de sharp (évite la compile native)
+ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
+ENV npm_config_update_notifier=false
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     build-essential \
     python3 \
     git \
-    libvips-dev \
+    ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/app
 
 COPY package.json package-lock.json ./
 RUN npm config set fetch-retry-maxtimeout 600000 -g \
-  && npm ci
+  && npm ci \
+  && npm install --os=linux --cpu=x64 sharp@0.34.5
 
 COPY . .
 
@@ -28,18 +33,18 @@ RUN npm run build \
   && npm prune --omit=dev
 
 # ---------- Runtime ----------
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    libvips42 \
-    wget \
-    ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
-
+ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=1337
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    wget \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/app
 

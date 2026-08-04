@@ -119,7 +119,7 @@ openssl rand -base64 32
 
 | Symptôme | Piste |
 |----------|--------|
-| Build Docker échoue (`npm ci` / `sharp`) | Image en Debian slim ; vérifier que `package-lock.json` est bien poussé sur GitHub ; `.dockerignore` doit exclure `node_modules` |
+| Build Docker échoue (`npm ci` / `sharp`) | Image **Node 22** Debian slim ; vérifier que le dernier `Dockerfile` est bien poussé (chemin `/opt/app`, pas `/opt`) ; `.dockerignore` doit exclure `node_modules` |
 | Crash DB / SSL | `DATABASE_SSL=true` + `DATABASE_SSL_REJECT_UNAUTHORIZED=false` |
 | Admin / assets en `localhost` | `PUBLIC_URL` = URL Railway HTTPS |
 | CORS front bloqué | `FRONTEND_URL` / `CORS_ORIGIN` = origine exacte du front |
