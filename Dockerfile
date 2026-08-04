@@ -37,7 +37,7 @@ FROM node:22-bookworm-slim
 
 ENV SHARP_IGNORE_GLOBAL_LIBVIPS=1
 ENV NODE_ENV=production
-ENV HOST=0.0.0.0
+ENV HOST=::
 ENV PORT=1337
 
 RUN apt-get update \

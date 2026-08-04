@@ -29,7 +29,7 @@ services:
       - "1337:1337"
     environment:
       NODE_ENV: production
-      HOST: 0.0.0.0
+      HOST: "::"
       PORT: 1337
       PUBLIC_URL: http://localhost:1337
       FRONTEND_URL: http://localhost:3000
@@ -47,6 +47,7 @@ services:
       TRANSFER_TOKEN_SALT: localTransferTokenSaltChangeMe
       ENCRYPTION_KEY: localEncryptionKeyChangeMe32b
       MASTER_KEY: localMasterKeyChangeMeForDevOnly
+      IS_PROXIED: "true"
     volumes:
       - fulani_uploads:/opt/app/public/uploads
 

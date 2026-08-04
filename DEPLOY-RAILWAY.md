@@ -28,7 +28,7 @@ Strapi 5 tourne dans une image Docker. PostgreSQL est le **plugin managé Railwa
 
 ```bash
 NODE_ENV=production
-HOST=0.0.0.0
+HOST=::
 # PORT est injecté par Railway — ne le force pas sauf besoin
 
 DATABASE_CLIENT=postgres
@@ -51,6 +51,7 @@ CORS_ORIGIN=https://<ton-front>
 IS_PROXIED=true
 ```
 
+> **Healthcheck Railway** : `HOST` doit être `::` (pas `0.0.0.0`), sinon le probe v2 reste en « service unavailable ».
 Astuce : après le premier deploy, copie l’URL publique du service dans `PUBLIC_URL`, puis redéploie.
 
 ### Variables optionnelles
@@ -119,6 +120,7 @@ openssl rand -base64 32
 
 | Symptôme | Piste |
 |----------|--------|
+| Healthcheck `/_health` → service unavailable | Mettre `HOST=::` (Railway IPv6). Vérifier aussi les logs runtime (DB / secrets manquants) |
 | Build Docker échoue (`npm ci` / `sharp`) | Image **Node 22** Debian slim ; vérifier que le dernier `Dockerfile` est bien poussé (chemin `/opt/app`, pas `/opt`) ; `.dockerignore` doit exclure `node_modules` |
 | Crash DB / SSL | `DATABASE_SSL=true` + `DATABASE_SSL_REJECT_UNAUTHORIZED=false` |
 | Admin / assets en `localhost` | `PUBLIC_URL` = URL Railway HTTPS |
