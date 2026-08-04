@@ -120,7 +120,7 @@ openssl rand -base64 32
 
 | Symptôme | Piste |
 |----------|--------|
-| Healthcheck `/_health` → service unavailable | Mettre `HOST=::` (Railway IPv6). Vérifier aussi les logs runtime (DB / secrets manquants) |
+| Healthcheck `/_health` → service unavailable | 1) Variable Railway **`HOST=::`** (surtout pas `0.0.0.0` copié du `.env`). 2) `railway.toml` sans healthcheck HTTP (déjà désactivé). 3) Vérifier les **Deploy Logs** (crash DB / secrets). Test manuel : `https://…/health` |
 | Build Docker échoue (`npm ci` / `sharp`) | Image **Node 22** Debian slim ; vérifier que le dernier `Dockerfile` est bien poussé (chemin `/opt/app`, pas `/opt`) ; `.dockerignore` doit exclure `node_modules` |
 | Crash DB / SSL | `DATABASE_SSL=true` + `DATABASE_SSL_REJECT_UNAUTHORIZED=false` |
 | Admin / assets en `localhost` | `PUBLIC_URL` = URL Railway HTTPS |

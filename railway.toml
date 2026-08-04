@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-healthcheckPath = "/_health"
-healthcheckTimeout = 300
+# Pas de healthcheck HTTP : Railway v2 + Strapi (IPv6 / boot long) fait souvent échouer /_health
+# même quand l'app démarre. Le conteneur est OK dès que le process reste up sur $PORT.
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
