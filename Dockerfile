@@ -1,44 +1,48 @@
 # Fulani Backend — Strapi 5 production image (Railway / Docker)
-# Multi-stage: build admin + server, then slim runtime
+# Debian slim: plus fiable que Alpine (sharp / native modules)
 
 # ---------- Build ----------
-FROM node:20-alpine AS build
+FROM node:20-bookworm-slim AS build
 
-RUN apk update && apk add --no-cache \
-  build-base gcc autoconf automake zlib-dev libpng-dev bash vips-dev git \
-  > /dev/null 2>&1
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3 \
+    git \
+    libvips-dev \
+  && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /opt/
-COPY package.json package-lock.json ./
-RUN npm install -g node-gyp
-RUN npm config set fetch-retry-maxtimeout 600000 -g && npm ci
-
-ENV PATH=/opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
+
+COPY package.json package-lock.json ./
+RUN npm config set fetch-retry-maxtimeout 600000 -g \
+  && npm ci
+
 COPY . .
 
-# Optional: bake admin API URL at build time (Railway can pass as build arg)
 ARG STRAPI_ADMIN_BACKEND_URL
 ENV STRAPI_ADMIN_BACKEND_URL=${STRAPI_ADMIN_BACKEND_URL}
-
 ENV NODE_ENV=production
-RUN npm run build
+
+RUN npm run build \
+  && npm prune --omit=dev
 
 # ---------- Runtime ----------
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
-RUN apk add --no-cache vips-dev wget
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libvips42 \
+    wget \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=1337
 
-WORKDIR /opt/
-COPY --from=build /opt/package.json /opt/package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
-
-ENV PATH=/opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
+
 COPY --from=build /opt/app ./
 
 RUN mkdir -p /opt/app/public/uploads \
