@@ -29,6 +29,12 @@ const SAFE_PRODUCT_POPULATE = {
   },
   image: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
   gallery: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
+  colorImages: {
+    populate: {
+      color: { fields: ['name', 'slug', 'hex'] },
+      image: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
+    },
+  },
   tags: { fields: ['name', 'slug'] },
   variants: {
     fields: [
@@ -128,6 +134,22 @@ const publicTag = (tag: AnyRecord) => ({
   name: tag.name,
 });
 
+const publicColorImage = (entry: AnyRecord) => {
+  const media = publicMedia(entry.image);
+  const colorRef = entry.color ?? null;
+  const colorName = String(entry.colorName ?? colorRef?.name ?? '').trim();
+  if (!colorName) return null;
+
+  return {
+    colorName,
+    colorSlug: colorRef?.slug ?? null,
+    colorHex: colorRef?.hex ?? null,
+    imageUrl: media?.url ?? null,
+    imageAlt: entry.imageAlt ?? media?.alternativeText ?? null,
+    image: media,
+  };
+};
+
 const publicVariant = (variant: AnyRecord) => ({
   id: String(variant.documentId ?? variant.id),
   name: variant.name,
@@ -162,6 +184,12 @@ const publicProduct = (product: AnyRecord) => {
   const mediaGallery = Array.isArray(product.gallery)
     ? product.gallery.map(publicMedia).filter(Boolean)
     : [];
+  const colorImages = (product.colorImages ?? [])
+    .map(publicColorImage)
+    .filter(Boolean) as Array<NonNullable<ReturnType<typeof publicColorImage>>>;
+  const imagesByColor = Object.fromEntries(
+    colorImages.filter((row) => row.imageUrl).map((row) => [row.colorName, row.imageUrl])
+  );
 
   return {
     id,
@@ -185,6 +213,8 @@ const publicProduct = (product: AnyRecord) => {
     colors: parseJsonList(product.availableColors),
     sizes: parseJsonList(product.availableSizes),
     formats: parseJsonList(product.availableFormats),
+    colorImages,
+    imagesByColor,
     isNew: Boolean(product.isNew),
     isFeatured: Boolean(product.isFeatured),
     category: publicCategory(product.category),

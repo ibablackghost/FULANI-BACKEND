@@ -88,14 +88,11 @@ export async function grantAuthenticatedCommercePermissions(strapi: Core.Strapi)
 }
 
 const DEFAULT_COLORS = [
-  { name: 'Noir', slug: 'noir', hex: '#111111' },
   { name: 'Blanc', slug: 'blanc', hex: '#FFFFFF' },
-  { name: 'Blue', slug: 'blue', hex: '#1E3A8A' },
+  { name: 'Noir', slug: 'noir', hex: '#111111' },
+  { name: 'Bleu de nuit', slug: 'bleu-de-nuit', hex: '#0A1628' },
   { name: 'Rouge', slug: 'rouge', hex: '#B91C1C' },
-  { name: 'Marron', slug: 'marron', hex: '#7C4A03' },
-  { name: 'Beige', slug: 'beige', hex: '#D6C3A5' },
   { name: 'Vert', slug: 'vert', hex: '#166534' },
-  { name: 'Jaune', slug: 'jaune', hex: '#CA8A04' },
 ];
 
 const DEFAULT_SIZES = [

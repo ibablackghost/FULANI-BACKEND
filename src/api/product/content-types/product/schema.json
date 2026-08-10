@@ -103,6 +103,12 @@
       "multiple": true,
       "allowedTypes": ["images"]
     },
+    "colorImages": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.color-image",
+      "description": "Une entrée par couleur : uploader la photo correspondante (Noir, Blanc, Bleu de nuit…)"
+    },
     "category": {
       "type": "relation",
       "relation": "manyToOne",

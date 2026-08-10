@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_product_color_images",
+  "info": {
+    "displayName": "Color image",
+    "description": "Photo du produit pour une couleur (upload Strapi)",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "colorName": {
+      "type": "string",
+      "required": true
+    },
+    "color": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::color.color"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "imageAlt": {
+      "type": "string"
+    }
+  }
+}
