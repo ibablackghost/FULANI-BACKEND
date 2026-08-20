@@ -1,0 +1,148 @@
+{
+  "kind": "collectionType",
+  "collectionName": "custom_orders",
+  "info": {
+    "singularName": "custom-order",
+    "pluralName": "custom-orders",
+    "displayName": "Commande sur mesure",
+    "description": "Formulaire client + mesures tailleur + emails Brevo"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "orderDate": {
+      "type": "date"
+    },
+    "lastName": {
+      "type": "string",
+      "required": true
+    },
+    "firstName": {
+      "type": "string",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "address": {
+      "type": "text",
+      "required": true
+    },
+    "totalAmount": {
+      "type": "integer",
+      "min": 0,
+      "description": "Montant total en XOF"
+    },
+    "advanceAmount": {
+      "type": "integer",
+      "min": 0,
+      "default": 0,
+      "description": "Avance en XOF"
+    },
+    "remainingAmount": {
+      "type": "integer",
+      "min": 0,
+      "description": "Reste à payer en XOF"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["new", "confirmed", "in_progress", "ready", "delivered", "cancelled"],
+      "default": "new",
+      "required": true
+    },
+    "notes": {
+      "type": "text"
+    },
+    "productName": {
+      "type": "string",
+      "description": "Modèle / produit demandé (texte libre)"
+    },
+    "selectedColor": {
+      "type": "string"
+    },
+    "selectedFormat": {
+      "type": "string",
+      "description": "Ex. Top, Ensemble"
+    },
+    "product": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product.product"
+    },
+    "epaule": {
+      "type": "decimal",
+      "description": "Épaule (cm)"
+    },
+    "manche": {
+      "type": "decimal",
+      "description": "Manche (cm)"
+    },
+    "poitrine": {
+      "type": "decimal",
+      "description": "Poitrine (cm)"
+    },
+    "taille": {
+      "type": "decimal",
+      "description": "Taille / tour de taille (cm)"
+    },
+    "longueurRobe": {
+      "type": "decimal",
+      "description": "Longueur robe (cm)"
+    },
+    "tourDeFesse": {
+      "type": "decimal",
+      "description": "Tour de fesse (cm)"
+    },
+    "ceinture": {
+      "type": "decimal",
+      "description": "Ceinture (cm)"
+    },
+    "cou": {
+      "type": "decimal",
+      "description": "Cou (cm)"
+    },
+    "longueurJupe": {
+      "type": "decimal",
+      "description": "Longueur jupe (cm)"
+    },
+    "longueurPantalon": {
+      "type": "decimal",
+      "description": "Longueur pantalon (cm)"
+    },
+    "largeurGrandBoubou": {
+      "type": "decimal",
+      "description": "Largeur grand boubou (cm)"
+    },
+    "longueurBlouse": {
+      "type": "decimal",
+      "description": "Longueur blouse (cm)"
+    },
+    "tourDeBras": {
+      "type": "decimal",
+      "description": "Tour de bras (cm)"
+    },
+    "cuisse": {
+      "type": "decimal",
+      "description": "Cuisse (cm)"
+    },
+    "poignet": {
+      "type": "decimal",
+      "description": "Poignet (cm)"
+    },
+    "emailStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "sent", "failed", "skipped"],
+      "default": "pending"
+    },
+    "emailError": {
+      "type": "text"
+    }
+  }
+}

@@ -41,6 +41,7 @@ export async function grantPublicCatalogPermissions(strapi: Core.Strapi) {
     'removeItem',
   ]);
   enable(perms, 'api::public-marketing', 'public-marketing', ['config']);
+  enable(perms, 'api::custom-order', 'custom-order-submit', ['submit']);
 
   await strapi.plugin('users-permissions').service('role').updateRole(publicRole.id, {
     name: roleData.name,
@@ -48,7 +49,7 @@ export async function grantPublicCatalogPermissions(strapi: Core.Strapi) {
     permissions: roleData.permissions,
   });
 
-  strapi.log.info('[fulani-catalog] Rôle Public: catalogue + panier guest + marketing-config.');
+  strapi.log.info('[fulani-catalog] Rôle Public: catalogue + panier guest + marketing-config + commande sur mesure.');
 }
 
 export async function grantAuthenticatedCommercePermissions(strapi: Core.Strapi) {
