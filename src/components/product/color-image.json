@@ -1,8 +1,8 @@
 {
   "collectionName": "components_product_color_images",
   "info": {
-    "displayName": "Color image",
-    "description": "Photo du produit pour une couleur (upload Strapi)",
+    "displayName": "Photo par couleur",
+    "description": "Photo du produit pour une couleur — upload OU URL",
     "icon": "picture"
   },
   "options": {},
@@ -19,7 +19,12 @@
     "image": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": ["images"],
+      "description": "Upload Strapi (prioritaire si rempli)"
+    },
+    "imageUrl": {
+      "type": "string",
+      "description": "URL externe si pas d’upload (ex. https://fulaniofficial.com/...)"
     },
     "imageAlt": {
       "type": "string"

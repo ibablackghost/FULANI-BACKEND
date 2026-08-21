@@ -90,6 +90,12 @@
       "type": "text",
       "description": "Formats / types disponibles (JSON array), ex. [\"Top\",\"Ensemble\"]"
     },
+    "formatImages": {
+      "type": "component",
+      "repeatable": true,
+      "component": "product.format-image",
+      "description": "Une entrée par format (Top, Ensemble) : upload ou URL de la photo"
+    },
     "isNew": {
       "type": "boolean",
       "default": false

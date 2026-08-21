@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_product_format_images",
+  "info": {
+    "displayName": "Photo par format",
+    "description": "Photo Top / Ensemble — upload OU URL",
+    "icon": "landscape"
+  },
+  "options": {},
+  "attributes": {
+    "formatName": {
+      "type": "string",
+      "required": true,
+      "description": "Ex. Top ou Ensemble (même nom que availableFormats)"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "description": "Upload Strapi (prioritaire si rempli)"
+    },
+    "imageUrl": {
+      "type": "string",
+      "description": "URL externe si pas d’upload"
+    },
+    "imageAlt": {
+      "type": "string"
+    }
+  }
+}

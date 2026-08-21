@@ -35,6 +35,11 @@ const SAFE_PRODUCT_POPULATE = {
       image: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
     },
   },
+  formatImages: {
+    populate: {
+      image: { fields: ['url', 'alternativeText', 'width', 'height', 'formats'] },
+    },
+  },
   tags: { fields: ['name', 'slug'] },
   variants: {
     fields: [
@@ -140,11 +145,34 @@ const publicColorImage = (entry: AnyRecord) => {
   const colorName = String(entry.colorName ?? colorRef?.name ?? '').trim();
   if (!colorName) return null;
 
+  const imageUrl =
+    media?.url ??
+    (entry.imageUrl ? String(entry.imageUrl).trim() : null) ??
+    null;
+
   return {
     colorName,
     colorSlug: colorRef?.slug ?? null,
     colorHex: colorRef?.hex ?? null,
-    imageUrl: media?.url ?? null,
+    imageUrl: imageUrl || null,
+    imageAlt: entry.imageAlt ?? media?.alternativeText ?? null,
+    image: media,
+  };
+};
+
+const publicFormatImage = (entry: AnyRecord) => {
+  const media = publicMedia(entry.image);
+  const formatName = String(entry.formatName ?? '').trim();
+  if (!formatName) return null;
+
+  const imageUrl =
+    media?.url ??
+    (entry.imageUrl ? String(entry.imageUrl).trim() : null) ??
+    null;
+
+  return {
+    formatName,
+    imageUrl: imageUrl || null,
     imageAlt: entry.imageAlt ?? media?.alternativeText ?? null,
     image: media,
   };
@@ -190,6 +218,12 @@ const publicProduct = (product: AnyRecord) => {
   const imagesByColor = Object.fromEntries(
     colorImages.filter((row) => row.imageUrl).map((row) => [row.colorName, row.imageUrl])
   );
+  const formatImages = (product.formatImages ?? [])
+    .map(publicFormatImage)
+    .filter(Boolean) as Array<NonNullable<ReturnType<typeof publicFormatImage>>>;
+  const imagesByFormat = Object.fromEntries(
+    formatImages.filter((row) => row.imageUrl).map((row) => [row.formatName, row.imageUrl])
+  );
 
   return {
     id,
@@ -215,6 +249,8 @@ const publicProduct = (product: AnyRecord) => {
     formats: parseJsonList(product.availableFormats),
     colorImages,
     imagesByColor,
+    formatImages,
+    imagesByFormat,
     isNew: Boolean(product.isNew),
     isFeatured: Boolean(product.isFeatured),
     category: publicCategory(product.category),
