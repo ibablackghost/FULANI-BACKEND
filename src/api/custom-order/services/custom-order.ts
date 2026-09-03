@@ -1,6 +1,6 @@
 import { factories } from '@strapi/strapi';
 import {
-  getBrevoNotifyEmail,
+  getBrevoNotifyEmails,
   isBrevoConfigured,
   sendBrevoEmail,
 } from '../../../integrations/brevo/mail';
@@ -217,22 +217,21 @@ export default factories.createCoreService('api::custom-order.custom-order' as a
       return { emailStatus: 'skipped' as const, emailError: 'Brevo non configuré' };
     }
 
+    const notifyEmails = getBrevoNotifyEmails();
+
     const customer = await sendBrevoEmail({
       to: [{ email: order.email, name: `${order.firstName} ${order.lastName}` }],
       subject: 'Fulani Official — confirmation commande sur mesure',
       htmlContent: this.buildCustomerEmailHtml(order),
-      replyTo: getBrevoNotifyEmail()
-        ? { email: getBrevoNotifyEmail()! }
-        : undefined,
+      replyTo: notifyEmails[0] ? { email: notifyEmails[0] } : undefined,
     });
 
-    const notifyTo = getBrevoNotifyEmail();
     let notifyOk = true;
     let notifyError = '';
 
-    if (notifyTo) {
+    if (notifyEmails.length > 0) {
       const notify = await sendBrevoEmail({
-        to: [{ email: notifyTo, name: 'Atelier Fulani' }],
+        to: notifyEmails.map((email) => ({ email, name: 'Atelier Fulani' })),
         subject: `[Sur mesure] ${order.firstName} ${order.lastName} — ${order.productName || 'commande'}`,
         htmlContent: this.buildNotifyEmailHtml(order),
         replyTo: { email: order.email, name: `${order.firstName} ${order.lastName}` },

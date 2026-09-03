@@ -98,12 +98,12 @@ Toutes les fiches reçues (client, montants, mesures, statut email).
 BREVO_API_KEY=xkeysib-...
 BREVO_SENDER_EMAIL=noreply@fulaniofficial.com
 BREVO_SENDER_NAME=Fulani Official
-BREVO_NOTIFY_EMAIL=atelier@fulaniofficial.com
+BREVO_NOTIFY_EMAIL=atelier@fulaniofficial.com,contact@fulaniofficial.com
 ```
 
 Au submit :
 1. Email **confirmation** → client  
-2. Email **notification** → `BREVO_NOTIFY_EMAIL` (atelier)
+2. Email **notification** → `BREVO_NOTIFY_EMAIL` (un ou plusieurs emails atelier, séparés par des virgules)
 
 Si Brevo n’est pas configuré, la commande est quand même sauvée (`emailStatus: skipped`).
 

@@ -73,4 +73,8 @@ export async function sendBrevoEmail(input: SendEmailInput): Promise<BrevoSendRe
   }
 }
 
-export const getBrevoNotifyEmail = () => getConfig().notifyEmail || null;
+export const getBrevoNotifyEmails = (): string[] => {
+  const raw = getConfig().notifyEmail;
+  if (!raw) return [];
+  return raw.split(',').map((email) => email.trim()).filter(Boolean);
+};
